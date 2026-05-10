@@ -16,6 +16,7 @@ public class FilterSettings {
         CoastalErosion.CODEC.fieldOf("coastal").forGetter(o -> o.coastal),
         PhysicalSnowAvalanche.CODEC.fieldOf("snowAvalanche").forGetter(o -> o.snowAvalanche),
         AeroErosion.CODEC.fieldOf("aeolic").forGetter(o -> o.aeolic),
+        Attrition.CODEC.fieldOf("attrion").forGetter(o -> o.attrition),
         Smoothing.CODEC.fieldOf("smoothing").forGetter(o -> o.smoothing)
     ).apply(instance, FilterSettings::new));
 
@@ -30,11 +31,12 @@ public class FilterSettings {
     public CoastalErosion coastal;
     public PhysicalSnowAvalanche snowAvalanche;
     public AeroErosion aeroErosion;
+    public Attrition attrition;
     public Smoothing smoothing;
 
     public FilterSettings(HydraulicErosion hydraulic, GlacialErosion glacial, SoilFluction soilFluction, AdvancedSubsurfaceFlow advancedSubsurfaceFlow, Aquifer aquifer,
                           ForceErosion force, LandSlide landSlide, ThermalErosion thermal, CoastalErosion coastal,
-                          PhysicalSnowAvalanche snowAvalanche, AeroErosion aeolic, Smoothing smoothing) {
+                          PhysicalSnowAvalanche snowAvalanche, AeroErosion aeolic, Attrition attrition, Smoothing smoothing) {
         this.hydraulic = hydraulic;
         this.glacial = glacial;
         this.soilFluction = soilFluction;
@@ -46,6 +48,7 @@ public class FilterSettings {
         this.coastal = coastal;
         this.snowAvalanche = snowAvalanche;
         this.aeolic = aeolic;
+        this.attrition = attrition;
         this.smoothing = smoothing;
     }
 
@@ -62,6 +65,7 @@ public class FilterSettings {
             this.snowAvalanche.copy(),
             this.landSlide.copy(),
             this.aeolic.copy(),
+            this.attrition.copy(),
             this.smoothing.copy()
         );
     }
@@ -423,6 +427,28 @@ public class FilterSettings {
 
         public LandSlide copy() {
             return new LandSlide(this.collapseThreshold.copy(), this.slideItensity.copy(), this.sinkIntensity.copy(), this.iterations.copy());
+        }
+    }
+
+    public static class Attrition {
+        public static final Codec<Attrition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("iterations").forGetter(o -> o.iterations),
+            Codec.FLOAT.fieldOf("attritionRate").forGetter(o -> o.attritionRate),
+            Codec.INT.fieldOf("dropletCount").forGetter(o -> o.dropletCount)
+        ).apply(instance, Attrition::new));
+
+        public int iterations;
+        public float attritionRate;
+        public int dropletCount;
+
+        public Attrition(int iterations, float attritionRate, int dropletCount) {
+            this.iterations = iterations;
+            this.attritionRate = attritionRate;
+            this.dropletCount = dropletCount;
+        }
+
+        public Attrition copy() {
+            return new Attrition(this.iterations.copy(), this.attritionRate.copy(), this.dropletCount.copy());
         }
     }
 
