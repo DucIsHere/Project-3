@@ -25,6 +25,7 @@ public class WorldFilters {
     private final WorldErosion<AdvancedSoilFluction> soilFluction;
     private final WorldErosion<AdvancedSubsurfaceFlow> advancedSubsurfaceFlow;
     private final WorldErosion<PhysicalSnowAvalanche> snowAvalanche;
+    private final WorldErosion<Attrition> attrition;
 
     private final int erosionIterations;
     private final int smoothingIterations;
@@ -57,7 +58,7 @@ public class WorldFilters {
         this.soilFluction = new WorldErosion<>(context.soilFluctionFactory, (s, size) -> s.getSize() == size);
         this.snowAvalanche = new WorldErosion<>(context.physicalSnowAvalancheFactory, (s, size) -> s.getSize() == size);
         this.advancedSubsurfaceFlow = new WorldErosion<>(context.advancedSubsurfaceFlowFactory, (s, size) -> s.getSize() == size);
-
+        this.attrition = new WorldErosion<>(context.attrition, (l, size) -> l.getSize() == size);
         this.soilIterations = settings.soilFluction.iterations;
         this.glacialIterations = settings.glacial.iterations;
         this.erosionIterations = context.preset.filters().erosion.dropletsPerChunk;
@@ -108,6 +109,7 @@ public class WorldFilters {
         // Bước 5: Trọng lực & Sạt lở
         this.thermalErosion.get(size).apply(map, seedX, seedZ, 2);
         this.landSlide.get(size).apply(map, seedX, seedZ, 1);
+        this.attrition.get(size).apply(map, seedX, seedZ, this.AttritionIterations)
         this.soilFluction.get(size).apply(map, seedX, seedZ, 4);
         this.snowAvalanche.get(size).apply(map, seedX, seedZ, this.snowAvalancheIterations);
         

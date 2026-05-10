@@ -1,4 +1,4 @@
-package com.regenerationforrged.world.worldgen;
+ppackage com.regenerationforrged.world.worldgen;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -53,6 +53,7 @@ public class GeneratorContext {
     public final IntFunction<AdvancedSubsurfaceFlow> advancedSubsurfaceFlowFactory;
     public final IntFunction<PhysicalSnowAvalanche> physicalSnowAvalancheFactory;
     public final IntFunction<AquiferFilter> aquiferFilterFactory;
+    public final IntFunction<Attrition> attritionFactory;
     
     public GeneratorContext(Preset preset, HolderGetter<Noise> noiseLookup, int seed, int tileSize, int tileBorder, int batchCount, @Nullable TileCache cache) {
         this.preset = preset;
@@ -112,6 +113,8 @@ public class GeneratorContext {
         this.advancedSubsurfaceFlowFactory = (size) -> new AdvancedSubsurfaceFlow(size, this.preset.filters().advancedSubsurfaceFlow, this.seed);
 
         this.aquiferFilterFactory = (size) -> new AquiferFilter(size, this.preset.filters().aquifer, this.seed);
+
+        this.attritionFactory = (size) -> new Attrition.factory(this);
 
         this.generator = new TileGenerator(heightMap.make(this), new worldFilters(this), tileSize, tileBorder, batchCount);
         this.cache = cache;
