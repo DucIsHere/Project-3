@@ -11,6 +11,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.levelgen.DensityFunction;
+
 import com.regenerationforrged.world.worldgen.biome.Continentalness;
 import com.regenerationforrged.world.worldgen.cell.Cell;
 import com.regenerationforrged.world.worldgen.cell.heightmap.ControlPoints;
