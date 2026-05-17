@@ -329,7 +329,7 @@ public class GlacialErosion implements Filter {
             }
             erosionBrushIndices[i] = Arrays.copyOf(tempIndices, count);
             erosionBrushWeights[i] = new float[count];
-            for (int j = 0; j < count; j++) erosionBrushWeights[i][j] = tempWeights[j] / sum;
+            for (int j = 0; j < countp; j++) erosionBrushWeights[i][j] = tempWeights[j] / sum;
         }
     }
 

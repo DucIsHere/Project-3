@@ -20,7 +20,7 @@ public class Attrition implements Filter {
         this.mapSize = mapSize;
         this.attritionRate = attritionRate;
         this.iterations = iterations;
-        this.dropletsCount = dropletsCount
+        this.dropletsCount = dropletsCount;
         this.modifier = modifier;
     }
 
