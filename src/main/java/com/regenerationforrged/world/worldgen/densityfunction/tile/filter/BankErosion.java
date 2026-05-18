@@ -56,14 +56,75 @@ public class BankErosion implements Filter {
     public void apply(Filterable map, int SeedX, int SeedZ, int iteration) {
         final Size size = map.getBlockSize();
         Cell[] cell = map.getBacking();
-        final int total = size.total();
+        int total = size.total();
         
         float[] fluidDepthMap = new float[total];
         float[] slopeMap = new float[total];
         float[] erosionOutput = new float[total];
 
         for (int x = 0; x < side.width() - 1; x++) {
-            for (int z = 0; z < side.height() - 1; z++) {}
+            for (int z = 0; z < side.height() - 1; z++) {
+                int idx = size.idx(x, z);
+                float currentH = cell[idx].height;
+
+                if (currentH >= riverWaterLevel - 3.0F && currentH <= riverWaterLevel + 14.0F) {
+                    fluidDepthMap[idx] = Math.max(0.0, (riverWaterLevel + 0.5F) - currentH);
+                    
+                    float dzdx = (cell[size.idx(x + 1, z)].height - cell[size.idx(x - 1, z)].height) / 2.0F;
+                    float dzdz = (cell[size.idx(x, z + 1)].height - cell[size.idx(x, z - 1)].height) / 2.0F;
+                    slopeMap[idx] = (float) Math.sqrt(dzdx * dzdx + dzdz * dzdz);
+                }
+            }
+        }
+
+        for (int x = 2; x < side.width() - 2; x++) {
+            for (int z = 2; z < side.height() - 2; z++) {
+                int idx = size.idx(x, z);
+                float slope = slopeMap[idx];
+                float waterDepth = fluidDepthMap[idx];
+
+                if (slope <= 0.0F) continue;
+
+                if (waterDepth > 0.0F) {
+                    float shearStress = RHO_WATER * GRAVITY * waterDepth * slope * 0.00005F;
+
+                    if (shearStress > criticalShearStress) {
+                        erosionOutput[idx] = erodbilitySpeedKd * (shearStress - criticalShearStress);
+                    }
+                }
+
+                if (cell[idx].height > riverWaterLevel && slope > maxStableSlope) {
+                    float overSlope = slope - maxStableSlope;
+                    erosionOutput[idx] += slumpingCoeff * overSlope * 0.1F;
+                }
+
+                float totalErosion = erosionOutput[idx];
+                
+                if (totalErosion > 0.0F && erosionBushIndices != null) {
+                    float dzdx = (cell[size.idx(x + 1, z)].height - cell[size.idx(x - 1, z)].height);
+                    float dzdz = (cell[size.idx(x, z + 1)].height - cell[size.idx(x, z - 1)].height);
+
+                    int moveX = dxdz > 0 ? -1 : 1;
+                    int moveZ = dzdz > 0 ? -1 : 1;
+
+                    int riverIdx = size.index(x + moveX, z + moveZ);
+
+                    for (int b = 0; b < erosionBushIndices[idx].length; b++) {
+                        int bushIdx = erosionBushIndices[idx][b];
+                        float weight = erosionBushWeights[idx][b];
+
+                        float actualChange = modifier.modify(cells[bushIdx], totalErosion * weight);
+
+                        cells[bushIdx].height -= actualChange;
+                        cells[bushIdx].heightErosion -= actualChange;
+
+                        if (cells[riverIdx].height < riverWaterLevel) {
+                            cells[riverIdx].height += actualChange * 0.4f; // Bồi tụ lòng sông
+                            cells[riverIdx].sediment += actualChange * 0.4f;
+                        }
+                    }
+                }
+            }
         }
     }
 }
