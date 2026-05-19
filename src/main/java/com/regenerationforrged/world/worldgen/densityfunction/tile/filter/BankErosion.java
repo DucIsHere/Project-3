@@ -127,4 +127,58 @@ public class BankErosion implements Filter {
             }
         }
     }
+
+    private void initErosionBushes(int radius) {
+        for (int i = 0; i < erosionBushIndices.length; i++) {
+            int cx = i % mapSize;
+            int cz = i / mapSize;
+
+            int[] tempIndices = new int[radius * radius * 4];
+            float[] tempWeight = new float[radius * radius * 4];
+
+            int count = 0;
+            float sum = 0;
+
+            for (int rz = -radius; rz <= radius; rz++) {
+                for (int rx = -radius; rx <= radius; rx++) {
+                    float distSq = rx * rx + rz * rz;
+                    if (distSq < radius * radius) {
+                        int tx = cx + rx;
+                        int tz = cz + rz;
+                        if (tx >= 0 && tx < mapSize && tz >= 0 && tz < mapSize) {
+                            float d = (float) Math.sqrt(distSq) / radius;
+                            float w = 1.0f - d; // Falloff tuyến tính khoét vách dốc gọn gàng
+                            tempIndices[count] = tz * mapSize + tx;
+                            tempWeights[count] = w;
+                            sum += w;
+                            count++;
+                        }
+                    }
+                }
+            }
+            erosionBrushIndices[i] = Arrays.copyOf(tempIndices, count);
+            erosionBrushWeights[i] = new float[count];
+            for (int j = 0; j < count; j++) {
+                erosionBrushWeights[i][j] = tempWeights[j] / sum;
+            }
+        }
+    }
+
+    public static class Factory implements IntFunction<BankErosion> {
+        private static final int SEED_OFFSET = 456789;
+        private final int seed;
+        private final Modifier modifier;
+        private final float waterLevel;
+
+        public Factory(final int seed, final FilterSettings filter, final Levels levels) {
+            this.seed = seed + SEED_OFFSET;
+            this.modifier = new Modifier.range(waterLevel - 4, levels.ground(130)).invert();
+            this.waterLevel = (float) levels.water;
+        }
+
+        @Override
+        public BankErosion apply(final int mapSize) {
+            return new BankErosion(this.seed, mapSize, this.modifier, this.waterLevel);
+        }
+    }
 }
