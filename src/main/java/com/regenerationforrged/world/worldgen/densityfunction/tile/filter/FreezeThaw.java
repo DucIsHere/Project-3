@@ -82,13 +82,13 @@ public class FreezeThaw extends Filter {
 
         final FastRandom random = new FastRandom(seed);
         final TerrainPos gradients1 = new TerrainPos();
-        final TerrainPos graduents2 = new TerrainPos();
+        final TerrainPos gradients2 = new TerrainPos();
 
         float[] damageMap = new float[currentMapSize];
         float[] moistureMap = new float[currentMapSize];
 
-        float[] tempMap = new float[total];
-        float[] sedimentMap = new float[total];
+        float[] tempMap = new float[currentMapSize];
+        float[] sedimentMap = new float[currentMapSize];
 
         for (int i = 0; i < total; i++) {
             int x = i % width;
