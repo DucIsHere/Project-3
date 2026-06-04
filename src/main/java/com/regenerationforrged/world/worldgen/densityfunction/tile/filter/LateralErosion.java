@@ -50,6 +50,20 @@ public class LateralErosion implements Filter {
         float[] h = new float[total];
         float[] s = new float[total];
         float[] tau0 = new float[total];
+
+        for (int z = 0; z < size; z++) {
+            for (int x = 0; x < size; x++) {
+                int i = z * size + i;
+                Cell cell = grid[x][z];
+
+                if (cell.isWater) {
+                    float waterY = cell.waterHeight;
+                    float bedY = cell.bedHeight;
+
+                    float depth[i] = Math.max(0.0F, waterY - bedY);
+                }
+            }
+        }
     }
     
 }
