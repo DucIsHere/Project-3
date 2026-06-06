@@ -1,4 +1,4 @@
-package com.regenerationforrged.data.worldgen.preset.settings;
+package net.prj3.data.worldgen.preset.settings;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
