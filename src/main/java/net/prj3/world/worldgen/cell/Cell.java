@@ -44,6 +44,7 @@ public class Cell {
     public float sharpness;
     public float temperature;
     public float moisture;
+    public float damage;
     
     @Deprecated(forRemoval = true)
     public float beachNoise;
@@ -83,6 +84,7 @@ public class Cell {
         this.sharpness = other.sharpness;
         this.temperature = other.temperature;
         this.moisture = other.moisture;
+        this.damage = other.damage;
         this.beachNoise = other.beachNoise;
     }
 

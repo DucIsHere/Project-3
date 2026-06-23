@@ -38,8 +38,8 @@ public class FreezeThaw extends Filter {
     private final float breakAmount;
     private final float zAmountDepth;
     private final float dDampingDepth;
-    private final float snowLine = 120.0F; // Bổ sung hằng số độ cao tuyết giả định
-    private final float sedimentCapacity = 2.0F; // Bổ sung sức chứa trầm tích giả định
+    private final float snowLine = 0.5F; // Bổ sung hằng số độ cao tuyết giả định
+    private final float sedimentCapacity = 0.02F; // Bổ sung sức chứa trầm tích giả định
 
     private final int[][] erosionBrushIndices;
     private final int[][] erosionBrushWeights;
@@ -84,11 +84,11 @@ public class FreezeThaw extends Filter {
         final TerrainPos gradients1 = new TerrainPos();
         final TerrainPos gradients2 = new TerrainPos();
 
-        float[] damageMap = new float[currentMapSize];
-        float[] moistureMap = new float[currentMapSize];
+        float[] damage = new float[currentMapSize];
+        float[] moisture = new float[currentMapSize];
 
-        float[] tempMap = new float[currentMapSize];
-        float[] sedimentMap = new float[currentMapSize];
+        float[] temperature = new float[currentMapSize];
+        float[] sediment = new float[currentMapSize];
 
         for (int i = 0; i < total; i++) {
             int x = i % width;
