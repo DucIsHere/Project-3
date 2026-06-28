@@ -47,7 +47,7 @@ public class PhysicalSnowAvalanche implements Filter {
         
         // Momentum Buffer (Lưu trữ động lượng để tính quán tính trượt)
         final float[] velocityMap = new float[total];
-        final float[] snowDepth = new float[total];
+        final int[] snowDepth = new float[total];
 
         for (int iter = 0; iter < iterations; iter++) {
             // PHA 1: PHÂN TÍCH ỨNG SUẤT (STRESS ANALYSIS)

@@ -1,0 +1,9 @@
+pluginManagement {
+    repositories {
+        maven { url "https://maven.fabricmc.net/" }
+        gradlePluginPortal()
+    }
+}
+
+include("src")
+rootProject.name = "TheOroject-3"
