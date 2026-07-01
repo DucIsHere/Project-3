@@ -126,7 +126,6 @@ public class TerrainSettings {
             Codec.FLOAT.fieldOf("verticalScale").forGetter(o -> o.verticalScale),
             Codec.FLOAT.fieldOf("horizontalScale").forGetter(o -> o.horizontalScale),
             Codec.FLOAT.fieldOf("baseHeight").forGetter(o -> o.baseHeight),
-            Codec.FLOAT.fieldOf("slopeScale").forGetter(o -> o.slopeScale),
             Codec.FLOAT.fieldOf("valleyDepth").forGetter(o -> o.valleyDepth),
             Codec.FLOAT.fieldOf("valleyWidth").forGetter(o -> o.valleyWidth),
             Sharpness.CODEC.fieldOf("sharpness").forGetter(o -> o.sharpness), // Áp dụng Sharpness cho từng Terrain

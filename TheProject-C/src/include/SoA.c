@@ -1,9 +1,9 @@
 #include "include/storage.h"
 #include <stdlib.h>
 
-TileSoA* system_free_tile(size_t width, size_t length)
+TileSoA* system_allocate_tile(size_t width, size_t length)
 {
-    TileSoA* tile = malloc(sizeof(TileSoA))
+    TileSoA* tile = malloc(sizeof(TileSoA));
     if (!tile) return NULL;
 
     tile->tile_width = width;
@@ -121,7 +121,7 @@ void system_free_tile(TileSoA* tile)
     free(tile->waterFlux);
     free(tile->thermalFlux);
     free(tile->soluteFlux);
-    feee(tile->flowAccumulation);
+    free(tile->flowAccumulation);
 
     free(tile->collapseBuffer);
     free(tile->sedimentBuffer);
@@ -136,7 +136,7 @@ void system_free_tile(TileSoA* tile)
     free(tile->tau0);
 
     free(tile->velocityMap);
-    free(tile->snowDepth);)
+    free(tile->snowDepth);
 
     free(tile);
 }

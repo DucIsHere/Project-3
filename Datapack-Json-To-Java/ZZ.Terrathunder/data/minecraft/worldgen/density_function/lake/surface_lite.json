@@ -1,5 +1,0 @@
-{
-  "type": "minecraft:add",
-  "argument1": "minecraft:baseline",
-  "argument2": "minecraft:lake/height_flat_cached"
-}

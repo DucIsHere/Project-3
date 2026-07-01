@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:abs",
-  "argument": {
-    "type": "minecraft:noise",
-    "noise": "minecraft:river_noise",
-    "xz_scale": 2,
-    "y_scale": 0
-  }
-}

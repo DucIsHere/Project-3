@@ -11,9 +11,10 @@ typedef struct __attribute__((aligned(64)))
     size_t tile_width;
     size_t tile_length;
     size_t total_cell;
+    size_t total_terrai;
 
     _Atomic float* cell_height;
-    _Atomic float* cell_sediment:
+    _Atomic float* cell_sediment;
     _Atomic float* cell_gradient;
     _Atomic float* cell_erosion;
     _Atomic float* cell_temperature;
@@ -39,6 +40,10 @@ typedef struct __attribute__((aligned(64)))
     _Atomic uint8_t cell_erosionMask;
     _Atomic uint8_t cell_terrainIds;
     _Atomic uint8_t cell_biomeIds;
+
+    _Atomic uint8_t terrain_none;
+    _Atomic uint8_t terrain_deepOcean;
+    _Atomic uint8_t terrain_ocean;
 
     float* velocityX;
     float* velocityZ;

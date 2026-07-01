@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:add",
-  "argument1": {
-    "type": "minecraft:add",
-    "argument1": "minecraft:mountains/offset",
-    "argument2": "minecraft:mountains/factor"
-  },
-  "argument2": "minecraft:mountains/jagged"
-}

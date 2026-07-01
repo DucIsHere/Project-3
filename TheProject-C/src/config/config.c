@@ -1,7 +1,5 @@
 #ifndef CONFIG_C
-#define CONFIG_C
-
-#include "config/Config.h"
+#define CONFIG_
 
 #define CACHE_LINE_SIZE 64
 #define SYSTEM_ALIGNMENT __attribute__((aligned(CACHE_LINE_SIZE)))

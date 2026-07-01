@@ -218,9 +218,21 @@ public class NoiseUtil {
         int index = (int)(r * NoiseUtil.radToIndex) & NoiseUtil.SIN_MASK;
         return NoiseUtil.SIN[index];
     }
+
+    public static float max(float a, float b) {
+        return (a > b) ? a : b;
+    }
+
+    public static float min(float a, float b) {
+        return (a < b) ? a : b;
+    }
     
     public static float cos(float r) {
         return sin(r + 1.5708f);
+    }
+
+    public static float max(float a, float b) {
+        return a ? b :
     }
     
     public static long seed(int x, int z) {
