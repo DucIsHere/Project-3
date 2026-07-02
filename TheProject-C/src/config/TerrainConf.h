@@ -36,12 +36,11 @@ typedef struct
 	float beach_noise_scale;
 	float beach_height;
 
-	int32_t aquifer_depth_offset;
 } TerrainTypr;
 
 typedef struct
 {
-	TerrainGeneral General;
+	TerrainGeneral general;
 
 	TerrainTypr steppe;
 	TerrainTypr plains;
@@ -58,8 +57,8 @@ typedef struct
 } TerrainSettings;
 
 __attribute__((visibility("default"))) TerrainSettings* native_settings();
-__attribute__((visibility("default"))) void free_settungs(TerrainSettings* settings);
-__attribute__((visibility("default"))) void set_native_general(FullTerrainSettings* settings, int32_t offset, int32_t size, float v_scale, float h_scale, bool fancy);
-__attribute__((visibility("default"))) void set_native_biome(FullTerrainSettings* settings, int32_t biome_id, float weight, float b_scale, float v_scale, float h_scale, float b_height, float s_scale, float v_depth, float v_width, float m_h_scale, float m_scale, float p_height, float c_sharp, float v_erosion, float v_weirdness, float r_erosion, float r_weirdness, float l_weirdness, float b_n_scale, float b_height, int32_t aq_offset);
+__attribute__((visibility("default"))) void free_settings(TerrainSettings* settings);
+__attribute__((visibility("default"))) void set_native_general(TerrainSettings* settings, int32_t offset, int32_t size, float v_scale, float h_scale, bool fancy);
+__attribute__((visibility("default"))) void set_native_biome(TerrainSettings* settings, int32_t biome_id, float weight, float b_scale, float v_scale, float h_scale, float b_height, float s_scale, float v_depth, float v_width, float m_h_scale, float m_scale, float p_height, float c_sharp, float v_erosion, float v_weirdness, float r_erosion, float r_weirdness, float l_weirdness, float b_n_scale, float beach_h);
 
 #endif

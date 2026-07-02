@@ -82,7 +82,7 @@ public class WorldSettings {
     		Codec.FLOAT.fieldOf("beach").forGetter((o) -> o.beach),
     		Codec.FLOAT.fieldOf("coast").forGetter((o) -> o.coast),
     		Codec.FLOAT.fieldOf("inland").forGetter((o) -> o.inland),
-			Codec.FLOAT.optionalFieldOf("coastLineBlend" 0.25F).forGetter((o) -> o.coastLineBlend)
+			Codec.FLOAT.FieldOf("coastLineBlend").forGetter((o) -> o.coastLineBlend) //
         ).apply(instance, ControlPoints::new));
 
     	public float mushroomFieldsInland;
