@@ -15,27 +15,27 @@ typedef struct
      float coast_line_blend;
 } ControlPoints;
 
-typedef struct
-{
-     int32_t world_height;
-     int32_t world_min_y;
 
-     float river_scale;
-
-     int32_t struct_separation;
-     int32_t world_depth;
-     int32_t sea_level;
-     int32_t lava_level;
-} Properties;
+typedef struct {
+    int32_t continent_scale;
+    float continent_jitter;
+    float continent_skipping;
+    float continent_size_variance;
+    int32_t continent_noise_octaves;
+    float continent_noise_gain;
+    float continent_noise_lacunarity;
+} Continent;
 
 typedef struct
 {
      ControlPoints points;
-     Properties properties;
+     Continent continent;
 } WorldSettings;
 
 __attribute__((visibility("default"))) WorldSettings* settings_native();
 __attribute__((visibility("default"))) void settings_free(WorldSettings* settings);
 __attribute__((visibility("default"))) void set_native_point(WorldSettings* settings, float m_f_i, float m_f_c, float d_ocean, float s_ocean, float b, fliat c, float il, float c_l_b);
 
+__attribute__((visibility("default"))) void set_world_continent(WorldSettings* settings, int32_t scale, float jitter, float skipping, float variance, int32_t octaves, float gain, float lacunarity
+);
 #endif 
