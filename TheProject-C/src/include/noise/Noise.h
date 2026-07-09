@@ -10,6 +10,13 @@
 typedef struct Noise Noise;
 typedef Noise* (*NoiseVisistorFunction)(const Noise* input, void* user_data);
 
+static inline Noise noise_map_all(Noise noise, NoiseVisitor visitor, void* user_data)
+{
+     if (visitor == NULL) return noise;
+     return visitor(noise, user_data); //
+}
+
+
 typedef struct 
 {
      void* node_ref;
