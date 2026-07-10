@@ -1,11 +1,16 @@
 #ifndef NOISE_H
 #define NOISE_H
 
-#include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <stddef.h>
 
 #include "FastNoise/include/FastNoise/FastNoise_C.h"
+typedef enum
+{
+     NOISE_TYPEDEF_SINPLEX = 1,
+     NOISE_TYPEDEF_PERLIN = 2
+} NóiseType;
 
 typedef struct Noise Noise;
 typedef Noise* (*NoiseVisistorFunction)(const Noise* input, void* user_data);

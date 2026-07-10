@@ -40,6 +40,18 @@ static inline float lerp(float a, float b, float alpha)
     return a + alpha * (b - a);
 }
 
+static inline float interpHermite(float f)
+{
+    return f * f * (3.0F - 2.0F * f); // Khớp đét Hermite Spline bậc 3
+}
+
+static inline float interpQuintic(float f)
+{
+    // Khớp đét Perlin Quintic bậc 5: f^3 * (f * (f * 6 - 15) + 10)
+    return f * f * f * (f * (f * 6.0F - 15.0F) + 10.0F); 
+}
+
+
 static inline int32_t hash_2d(int32_t seed, int32_t x, int32_t y) {
     int32_t hash = seed ^ (x * 1619) ^ (y * 31337);
     hash *= hash * hash * 60493;
