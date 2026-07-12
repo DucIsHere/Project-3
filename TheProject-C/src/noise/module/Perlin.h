@@ -79,14 +79,14 @@ static inline float perlin_raw_single_2d(float x, float y, int32_t seed, Interpo
 static inline float perlin_compute_2d_internal(const PerlinData* p, float x, float z, int32_t seed) {
     float value = 0.0F;
     float freq = p->frequency; //
-    float amp = 1.0F;
+    float amplitudes = 1.0F;
 
     for (int32_t i = 0; i < p->octaves; ++i) { //
         float signal = i < 7 ? PERLIN_SIGNALS[i] : 1.0F; //
         // Chạy qua hàm sample đơn tầng, seed tăng dần theo tầng octave giống hệt Java
-        value += perlin_raw_single_2d(x * freq, z * freq, seed + i, p->interpolation) * signal * amp; //
+        value += perlin_raw_single_2d(x * freq, z * freq, seed + i, p->interpolation) * signal * amplitudes; //
         freq *= p->lacunarity; //
-        amp *= p->gain; //
+        amplitudes *= p->gain; //
     }
     return value;
 }
@@ -94,7 +94,7 @@ static inline float perlin_compute_2d_internal(const PerlinData* p, float x, flo
 // Hàm Factory tạo Perlin trả về Struct Noise phẳng cho hệ thống lớn dùng
 static inline Noise noises_perlin_create(int32_t scale, int32_t octaves, float lacunarity, float gain, InterpolationType interp) {
     Noise n;
-    n.type = NOISE_TYPE_CUSTOM_PERLIN;
+    n.type = NOISE_TYPEDEF_PERLIN;
     
     PerlinData* p = (PerlinData*)n.data.custom_data;
     p->frequency = 1.0F / (float)scale; // Chuyển đổi từ scale sang frequency hệt bên Java

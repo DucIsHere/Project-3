@@ -9,11 +9,12 @@
 typedef enum
 {
      NOISE_TYPEDEF_SINPLEX = 1,
-     NOISE_TYPEDEF_PERLIN = 2
-} NóiseType;
+     NOISE_TYPEDEF_PERLIN = 2,
+     NOISE_TYPEDEF_PERLIN2 = 3
+} NoiseType;
 
 typedef struct Noise Noise;
-typedef Noise* (*NoiseVisistorFunction)(const Noise* input, void* user_data);
+typedef Noise* (*NoiseVisitorFunction)(const Noise* input, void* user_data);
 
 static inline Noise noise_map_all(Noise noise, NoiseVisitor visitor, void* user_data)
 {
@@ -21,12 +22,19 @@ static inline Noise noise_map_all(Noise noise, NoiseVisitor visitor, void* user_
      return visitor(noise, user_data); //
 }
 
-
 typedef struct 
 {
+     int32_t type;
+
      void* node_ref;
      float min_value;
      float max_value;
+     
+     union
+     {
+          uint8_t custom_data[32];
+     } data;
+     
 } Noise;
 
 static inline Noise noise_create(const char* encoded_str, float min_v, float max_v)
@@ -43,13 +51,13 @@ static inline void noise_free(Noise* noise)
      if (noise->node_ref != NULL)
      {
           fnDeleteNodeRef(noise->node_ref);
-          noise->node_ref != NULL;
+          noise->node_ref = NULL;
      }
 }
 
 static inline float noise_compute_2d(const Noise* noise, float x, float z, int32_t seed)
 {
-     if (noise->node_ref != NULL) return 0;
+     if (noise->node_ref == NULL) return 0;
      return fnGenSingle2D(noise->node_ref, x, z, seed);
 }
 
