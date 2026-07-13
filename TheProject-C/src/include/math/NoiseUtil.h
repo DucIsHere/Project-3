@@ -29,6 +29,12 @@ static inline float clamp(float value, float min, float max)
      return value < min ? min : (value > max ? max : value);
 }
 
+static inline int32_t floorf(float f)
+{
+    int32_t i = (int32_t)f;
+    return f < (float)i ? i - 1 : i;
+}
+
 static inline float map(float value, float min, float max, float inv_range)
 {
      float dif = clamp(value, min, max) - min;
