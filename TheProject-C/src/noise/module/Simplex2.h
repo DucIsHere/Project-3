@@ -3,7 +3,10 @@
 
 #include <stdint.h>
 #include <math.h>
+
 #include "Noise.h" 
+#include "include/noise/Noise.h"
+#include "include/math/NoiseUtil.h"
 
 static const float SIMPLEX2_SIGNALS[] = { 1.0F, 0.989F, 0.81F, 0.781F, 0.708F, 0.702F, 0.696F };
 
@@ -15,33 +18,6 @@ typedef struct {
     float min_val;
     float max_val;
 } Simplex2Data;
-
-// Khớp chuẩn xác hàm clamp từ NoiseUtil.java
-static inline float simplex2_noise_util_clamp(float value, float min, float max) {
-    return (value < min) ? min : ((value > max) ? max : value);
-}
-
-// Khớp chuẩn xác hàm map từ NoiseUtil.java (có chứa logic gán biên cứng)
-static inline float simplex2_noise_util_map(float value, float min, float max, float range) {
-    float dif = simplex2_noise_util_clamp(value, min, max) - min;
-    return (dif >= range) ? 1.0F : (dif / range);
-}
-
-// Khớp chuẩn xác hàm hash2D nguyên bản từ NoiseUtil.java
-static inline int32_t simplex2_hash_2d(int32_t seed, int32_t x, int32_t y) {
-    int32_t hash = seed;
-    hash ^= 1619 * x;
-    hash ^= 31337 * y;
-    hash = hash * hash * hash * 60493;
-    hash ^= hash >> 13;
-    return hash;
-}
-
-// Khớp chuẩn xác hàm floor từ NoiseUtil.java
-static inline int32_t simplex2_noise_util_floor(float f) {
-    return (f >= 0.0F) ? ((int32_t)f) : ((int32_t)f - 1);
-}
-
 // Ma trận xoay góc gradient mặc định của Simplex gốc (Mã hóa bitwise)
 static inline float simplex2_native_grad(int32_t hash, float x, float y) {
     int32_t h = hash & 7; 
@@ -131,7 +107,7 @@ static inline float simplex2_compute_2d_internal(const Simplex2Data* s, float x,
 // Factory khởi tạo cấu hình tương đương cấu trúc dữ liệu constructor trong Java
 static inline Noise noises_simplex2_create(float frequency, int32_t octaves, float lacunarity, float gain) {
     Noise n;
-    n.type = 4;        
+    n.type = NOISE_TYPEDEF_SIMPLEX2;        
     n.node_ref = NULL; 
     n.min_value = 0.0F; // KhớpminValue() -> 0.0F
     n.max_value = 1.0F; // Khớp maxValue() -> 1.0F
