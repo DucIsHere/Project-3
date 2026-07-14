@@ -27,20 +27,23 @@ static inline float simplex_util_grad_coord_2d_24(int32_t seed, int32_t x, int32
 
 static inline float cal_max_val(int32_t octaves, float gain) 
 {
-     float gain_acc = 1.0f;
-     float sum = 0.0f;
-     for (int32_t i = 0; i < octaves; ++i)
-     {
-          sum += (i < 7 ? SIMPLEX_SIGNALS[i] : 1.0f) * gain_acc;
-          gain_acc *= gain;
-     }
-     return sum;
+    int32_t index = octaves < 7 ? octaves : 6;
+    if (index < 0) index = 0;
+    float signals = SIMPLEX_SIGNALS[index];
+    float amp = 1.0f;
+    float sum = 0.0f;
+    for (int32_t i = 0; i < octaves; ++i)
+    {
+        sum += amp * signals;
+        amp *= gain;
+    }
+    return sum;
 }
 
 static inline float simplex_raw_single_2d(int32_t seed, float x, float y)
 {
-     float skew = (x + y) * 0.3660245f;
-     int32_t i = (int32_t)floorf(x + skew); //
+    float skew = (x + y) * 0.3660245f;
+    int32_t i = (int32_t)floorf(x + skew); //
     int32_t j = (int32_t)floorf(y + skew); //
     
     float unskew = (float)(i + j) * 0.21132487F; // Unskew factor: (3 - sqrt(3)) / 6
@@ -80,11 +83,32 @@ static inline float simplex_raw_single_2d(int32_t seed, float x, float y)
     return 70.0F * (n0 + n2 + n3); //
 }
 
+static inline float simplex_compute_2d_internal(const SimplexData* s, float x, float z, int32_t seed)
+{
+    x *= s->frequency;
+     z *= s->frequency;
+     
+     float sum = 0.0F;
+     float amp = 1.0F; // Khởi tạo bằng 1.0F chuẩn Simplex Java
+
+     for (int32_t i = 0; i < s->octaves; ++i) {
+          sum += simplex_raw_single_2d(seed + i, x, z) * amp;
+          x *= s->lacunarity;
+          z *= s->lacunarity;
+          amp *= s->gain;
+     }
+     
+     // Áp dụng thuật toán map dải điểm [-max, max] về [0.0, 1.0]
+     float max_val = simplex_calc_max_val(s->octaves, s->gain);
+     float min_val = -max_val;
+     return (sum - min_val) / (max_val - min_val);
+}
+
 // Hàm khởi tạo Simplex trả về kiểu cấu trúc Noise phẳng bọc ngoài
 static inline Noise simplex_create(float frequency, int32_t octaves, float lacunarity, float gain) 
 {
     Noise n;
-    n.type = NOISE_TYPE_CUSTOM_SIMPLEX;
+    n.type = NOISE_TYPEDEF_SIMPLEX;
     
     // Ép kiểu vùng nhớ thô 24 bytes của Noise thành SimplexData để ghi thông số cấu hình
     SimplexData* s = (SimplexData*)n.data.custom_data;

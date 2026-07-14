@@ -8,9 +8,10 @@
 #include "FastNoise/include/FastNoise/FastNoise_C.h"
 typedef enum
 {
-     NOISE_TYPEDEF_SINPLEX = 1,
+     NOISE_TYPEDEF_SIMPLEX = 1,
      NOISE_TYPEDEF_PERLIN = 2,
-     NOISE_TYPEDEF_PERLIN2 = 3
+     NOISE_TYPEDEF_PERLIN2 = 3,
+     NOISE_TYPEDEF_SIMPLEX2 = 4
 } NoiseType;
 
 typedef struct Noise Noise;
@@ -91,6 +92,28 @@ static inline void noise_conpute_array_3d(const Noise* noise, float* out_noise_a
 {
      if (noise->node_ref) return;
      fnGenPositionArray3D(noise->node_ref, out_noise_array, count, x_array, y_array, z_array, x_offset, y_offset, z_offset, seed, NULL);
+}
+
+static inline float noise_compute_2d(const Noise* noise, float x, float z, int32_t seed)
+{
+     // 1. Nếu có node_ref, ưu tiên đẩy cho FastNoise2 tính toán theo cây nút mã hóa
+     if (noise->node_ref != NULL) 
+     {
+          return fnGenSingle2D(noise->node_ref, x, z, seed);
+     }
+     
+     // 2. Nếu node_ref bằng NULL, tức là đây là loại Custom Noise tự code tay qua mảng byte
+     switch (noise->type) 
+     {
+          case 4: // NOISE_TYPEDEF_SIMPLEX2
+               return simplex2_compute_2d_internal((const Simplex2Data*)noise->data.custom_data, x, z, seed);
+          
+          // case 1: Simplex1...
+          // case 2: Perlin...
+          
+          default:
+               return 0.0F;
+     }
 }
 
 #endif
