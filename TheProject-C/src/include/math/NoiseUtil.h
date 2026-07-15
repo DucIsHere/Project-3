@@ -57,15 +57,34 @@ static inline float interpQuintic(float f)
     return f * f * f * (f * (f * 6.0F - 15.0F) + 10.0F); 
 }
 
+static inline int32_t hash(int32_t x, int32_t y)
+{
+    int32_t hash = x;
+    hash ^= 31337 * y;
+    hash = hash * hash * hash * 60493;
+    hash ^= hash >> 13;
+    return hash;
+}
 
 static inline int32_t hash_2d(int32_t seed, int32_t x, int32_t y) {
-    int32_t hash = seed ^ (x * 1619) ^ (y * 31337);
-    hash *= hash * hash * 60493;
-    return (hash >> 13) ^ hash;
+    int32_t hash = seed;
+    hash ^= 1619 * x;
+    hash ^= 31337 * y;
+    hash = hash * hash * hash * 60493;
+    hash ^= hash >> 13;
+    return hash;
 }
 
 static inline Vec2f cell(int32_t seed, int32_t x, int32_t y) {
     return CELL_2D[hash_2d(seed, x, y) & 0xFF];
+}
+
+static inline float valCoord2D(int32_t seed, int32_t x, int32_t y)
+{
+    int32_t n = seed;
+    n ^= 1619 * x;
+    n ^= 31337 * y;
+    return n * n * n * 60493 / 2.14748365E9F;
 }
 
 static inline float sin(float rad) {
@@ -78,10 +97,24 @@ static inline float cos(float rad)
     return sin(rad + 1.5708f);
 }
 
-static inline Vec2f coord2D_24(int32_t sedd, int32_t x, int32_t y)
+static inline float coord2D(int32_t seed, int32_t x, int32_t y)
 {
-    int32_t hash = hash_2d(seed, x, y);
-    int32_t selector24 = (int32_t)((hash & 0x3FFFFF) * 1.3333334f) & 0x1F;
+    int32_t hash = seed;
+    hash ^= 1619 * x;
+    hash ^= 31337 * y;
+    hash = hash * hash * hash * 60493;
+    hash ^= hash >> 13;
+    return GRAD_2D[hash & 0x7];
+}
+
+static inline Vec2f coord2D_24(int32_t seed, int32_t x, int32_t y)
+{
+    int32_t hash = seed;
+    hash ^= 1619 * x;
+    hash ^= 31337 * y;
+    hash = hash * hash * hash * 60493;
+    hash ^= hash >> 13;
+    int32_t selector24 = (int32_t)((hash & 0x3FFFFF) * 1.3333334F) & 0x1F;
     return GRAD_2D_24[selector24];
 
 }

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "FastNoise/include/FastNoise/FastNoise_C.h"
 typedef enum
@@ -11,7 +12,8 @@ typedef enum
      NOISE_TYPEDEF_SIMPLEX = 1,
      NOISE_TYPEDEF_PERLIN = 2,
      NOISE_TYPEDEF_PERLIN2 = 3,
-     NOISE_TYPEDEF_SIMPLEX2 = 4
+     NOISE_TYPEDEF_SIMPLEX2 = 4, 
+     NOISE_TYPEDEF_ADD = 5
 } NoiseType;
 
 typedef struct Noise Noise;
@@ -94,7 +96,7 @@ static inline void noise_conpute_array_3d(const Noise* noise, float* out_noise_a
      fnGenPositionArray3D(noise->node_ref, out_noise_array, count, x_array, y_array, z_array, x_offset, y_offset, z_offset, seed, NULL);
 }
 
-static inline float noise_compute_2d(const Noise* noise, float x, float z, int32_t seed)
+static inline float noise_2d(const Noise* noise, float x, float z, int32_t seed)
 {
      // 1. Nếu có node_ref, ưu tiên đẩy cho FastNoise2 tính toán theo cây nút mã hóa
      if (noise->node_ref != NULL) 

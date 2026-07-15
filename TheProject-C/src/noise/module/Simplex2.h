@@ -18,6 +18,16 @@ typedef struct {
     float min_val;
     float max_val;
 } Simplex2Data;
+
+static inline int32_t simplex2_hash_2d(int32_t seed, int32_t x, int32_t y) {
+    int32_t hash = seed;
+    hash ^= 1619 * x;
+    hash ^= 31337 * y;
+    hash = hash * hash * hash * 60493;
+    hash ^= hash >> 13;
+    return hash;
+}
+
 // Ma trận xoay góc gradient mặc định của Simplex gốc (Mã hóa bitwise)
 static inline float simplex2_native_grad(int32_t hash, float x, float y) {
     int32_t h = hash & 7; 
@@ -47,8 +57,8 @@ static inline float simplex2_raw_single_2d(int32_t seed, float x, float y) {
     float t;
 
     float skew = (x + y) * 0.366025403F;
-    int32_t i = simplex2_noise_util_floor(x + skew);
-    int32_t j = simplex2_noise_util_floor(y + skew);
+    int32_t i = floorf(x + skew);
+    int32_t j = floorf(y + skew);
 
     float unskew = (i + j) * 0.211324865F;
     float x2 = x - (i - unskew);
