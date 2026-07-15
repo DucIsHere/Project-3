@@ -24,6 +24,11 @@ extern const Vec2f GRAD_2D[8];
 extern const Vec2f GRAD_2D_24[32];
 extern float SIN[SIN_COUNT];
 
+static inline float abs(float x)
+{
+    return x < 0 ? -x : x;
+}
+
 static inline float clamp(float value, float min, float max)
 {
      return value < min ? min : (value > max ? max : value);

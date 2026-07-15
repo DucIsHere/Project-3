@@ -13,7 +13,8 @@ typedef enum
      NOISE_TYPEDEF_PERLIN = 2,
      NOISE_TYPEDEF_PERLIN2 = 3,
      NOISE_TYPEDEF_SIMPLEX2 = 4, 
-     NOISE_TYPEDEF_ADD = 5
+     NOISE_TYPEDEF_ADD = 5,
+     NOISE_TYPEDEF_ABS = 6
 } NoiseType;
 
 typedef struct Noise Noise;
