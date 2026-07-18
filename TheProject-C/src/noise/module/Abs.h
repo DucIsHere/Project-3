@@ -16,7 +16,7 @@ static inline Noise abs_create(Noise* input)
 {
      Noise n;
      n.type = NOISE_TYPEDEF_ABS;
-     n.rode_ref = NULL;
+     n.node_ref = NULL;
 
      float min = noise_get_min_value(input);
      float max = noise_get_max_value(input);

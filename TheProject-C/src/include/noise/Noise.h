@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include "FastNoise/include/FastNoise/FastNoise_C.h"
+
 typedef enum
 {
      NOISE_TYPEDEF_SIMPLEX = 1,
@@ -14,7 +15,9 @@ typedef enum
      NOISE_TYPEDEF_PERLIN2 = 3,
      NOISE_TYPEDEF_SIMPLEX2 = 4, 
      NOISE_TYPEDEF_ADD = 5,
-     NOISE_TYPEDEF_ABS = 6
+     NOISE_TYPEDEF_ABS = 6,
+     NOISE_TYPEDEF_ALPHA = 7,
+     NOISE_TYPEDEF_BILLOW = 8
 } NoiseType;
 
 typedef struct Noise Noise;

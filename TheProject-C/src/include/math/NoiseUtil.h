@@ -29,6 +29,16 @@ static inline float abs(float x)
     return x < 0 ? -x : x;
 }
 
+static inline float min(float a, float b)
+{
+    return (a < b) ? a : b;
+}
+
+static inline float max(float a, float b)
+{
+    return (a > b) ? a : b;
+}
+
 static inline float clamp(float value, float min, float max)
 {
      return value < min ? min : (value > max ? max : value);
