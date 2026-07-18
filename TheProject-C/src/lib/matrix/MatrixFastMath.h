@@ -72,4 +72,138 @@ static inline __m256 fm_avx2_exp(__m256 x)
      return _mm256_mul_ps(p, pow2nd);
 }
 
+// ==========================================================
+// 2. TẬP LỆNH SCALAR - TỰ CHẾ CHO TỪNG PHẦN TỬ ĐƠN LẺ
+// ==========================================================
+
+/**
+ * Trị tuyệt đối nhanh (Triệt tiêu bit dấu bằng Bitwise AND)
+ */
+static inline float fm_abs(float x) 
+{
+    uint32_t i = *(uint32_t*)&x;
+    i &= 0x7FFFFFFF; // Tắt bit dấu ngoài cùng bên trái
+    
+    return *(float*)&i;
+}
+
+/**
+ * Căn bậc hai nghịch đảo siêu tốc (Fast Inverse Square Root) + 1 bước lặp Newton-Raphson
+ */
+static inline float fm_inv_sqrt(float x) 
+{
+    float xhalf = 0.5f * x;
+    uint32_t i = *(uint32_t*)&x;
+    i = 0x5f3759df - (i >> 1); // Phép băm ma thuật Quake
+    x = *(float*)&i;
+    x = x * (1.5f - xhalf * x * x); // Sửa sai số
+
+    return x;
+}
+
+/**
+ * Căn bậc hai nhanh bằng phần cứng Intel/AMD (Triệt tiêu vòng lặp tính toán)
+ */
+static inline float fm_sqrt(float x) 
+{
+    __m128 vx = _mm_set_ss(x);
+
+    return _mm_cvtss_f32(_mm_sqrt_ss(vx));
+}
+
+/**
+ * Hàm làm tròn xuống nhanh (Floor) bằng tập lệnh SSE4.1 tích hợp sẵn
+ */
+static inline float fm_floor(float x) 
+{
+    __m128 vx = _mm_set_ss(x);
+
+    return _mm_cvtss_f32(_mm_round_ss(vx, vx, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC));
+}
+
+/**
+ * Hàm làm tròn lên nhanh (Ceil)
+ */
+static inline float fm_ceil(float x) 
+{
+    __m128 vx = _mm_set_ss(x);
+
+    return _mm_cvtss_f32(_mm_round_ss(vx, vx, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC));
+}
+
+/**
+ * Hàm lượng giác đơn bản Scalar: Sin, Cos, Tan
+ */
+static inline float fm_sin(float x) 
+{
+    __m256 vx = _mm256_set1_ps(x);
+    __m256 vsin, vcos;
+    fm_avx2_sincos(vx, &vsin, &vcos);
+
+    return _mm256_cvtss_f32(vsin);
+}
+
+static inline float fm_cos(float x) 
+{
+    __m256 vx = _mm256_set1_ps(x);
+    __m256 vsin, vcos;
+    fm_avx2_sincos(vx, &vsin, &vcos);
+
+    return _mm256_cvtss_f32(vcos);
+}
+
+static inline float fm_tan(float x) 
+{
+    __m256 vx = _mm256_set1_ps(x);
+    __m256 vsin, vcos;
+    fm_avx2_sincos(vx, &vsin, &vcos);
+    float s = _mm256_cvtss_f32(vsin);
+    float c = _mm256_cvtss_f32(vcos);
+
+    return (c != 0.0f) ? (s / c) : 0.0f;
+}
+
+/**
+ * Hàm Logarit tự nhiên ln(x) tốc độ cao dựa trên việc bóc tách số mũ bit
+ */
+static inline float fm_log(float x) 
+{
+    if (x <= 0.0f) return 0.0f;
+    uint32_t val_int = *(uint32_t*)&x;
+    int32_t exp = ((val_int >> 23) & 0xFF) - 127;
+    
+    // Đưa phần trị (mantissa) về khoảng [0.5, 1.0]
+    val_int = (val_int & 0x007FFFFF) | 0x3F000000;
+    float f = *(float*)&val_int;
+    
+    // Xấp xỉ đa thức bậc 3 cho ln(f) quanh điểm f = 0.707
+    float num = f - 1.0f;
+    float denom = f + 1.0f;
+    float s = num / denom;
+    float s2 = s * s;
+    float log_f = s * (2.0f + s2 * (0.666666667f));
+    
+    return (float)exp * FM_LN2 + log_f;
+}
+
+/**
+ * Lũy thừa nhanh x^y bằng công thức toán logarit: x^y = exp(y * log(x))
+ */
+static inline float fm_pow(float x, float y) 
+{
+    if (x == 0.0f) return 0.0f;
+    if (y == 0.0f) return 1.0f;
+    
+    float lx = fm_log(fm_abs(x));
+    __m256 vex = _mm256_set1_ps(y * lx);
+    float res = _mm256_cvtss_f32(fm_avx2_exp(vex));
+    
+    // Xử lý dấu của cơ số âm khi số mũ nguyên lẻ
+    if (x < 0.0f && fm_abs(y - fm_floor(y)) < 1e-6f) 
+    {
+        if (((int32_t)y) & 1) res = -res;
+    }
+    return res;
+}
+
 #endif
