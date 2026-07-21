@@ -28,7 +28,7 @@ static inline GenWarp gen_warp_make(int32_t seed, const Noise* n_lake1_x, const 
      gw.lake_2 = domain_create(n_lake2_x, n_lake2_z, 50.0f);
 
      gw.river_1 = domain_create(n_river1_x, n_river1_z, 95.0f);
-     gw.river_2 = donain_create(n_river2_x, n_river2_z, 16.0f);
+     gw.river_2 = domain_create(n_river2_x, n_river2_z, 16.0f);
 
      return gw;
 }
