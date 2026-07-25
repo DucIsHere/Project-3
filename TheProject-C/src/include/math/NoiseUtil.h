@@ -29,6 +29,40 @@ static inline float abs(float x)
     return x < 0 ? -x : x;
 }
 
+static inline float pow(float value, int power)
+{
+    if (power == 0) 
+    {
+        return 1.0F;
+    }
+
+    if (power == 1) 
+    {
+        return value;
+    }
+        
+    if (power == 2) 
+    {
+        return value * value;
+    }
+    
+    if (power == 3) {
+        return value * value * value;
+    }
+
+    if (power == 4) {
+        return value * value * value * value;
+    }
+
+    float result = 1.0F;
+
+    for (int i = 0; i < power; ++i) {
+        result *= value;
+    }
+    
+    return result;
+}
+
 static inline float min(float a, float b)
 {
     return (a < b) ? a : b;
