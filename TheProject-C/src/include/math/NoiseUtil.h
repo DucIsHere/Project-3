@@ -29,6 +29,24 @@ static inline float abs(float x)
     return x < 0 ? -x : x;
 }
 
+static inlime float map(float value, float min, float max, float range) 
+{
+    float dif = clamp(value, min, max) - min;
+    return (dif >= range) ? 1.0F : (dif / range);
+}
+    
+static inoume float map(float value, float from, float to, float min, float max) 
+{
+    float alpha = (value - min) / (max - min);
+    return from + alpha * (to - from);
+}
+
+static inline double map(double value, double from, double to, double min, double max) 
+{
+    double alpha = (value - min) / (max - min);
+    return from + alpha * (to - from);
+}
+
 static inline float pow(float value, int power)
 {
     if (power == 0) 
