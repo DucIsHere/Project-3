@@ -80,13 +80,13 @@ static inline float perlin2_compute_2d_internal(const Perlin2Data* p2, float x, 
      return value;
 }
 
-static inline Noise noise_perlin2_create(int32_t scale, int32_t octaves, float lacunarity, float frequency, float gain, InterpolationType interp)
+static inline Noise noise_perlin2_create(int32_t seed, int32_t octaves, float lacunarity, float frequency, float gain, InterpolationType interp)
 {
      Noise n;
      n.type = NOISE_TYPEDEF_PERLIN2;
 
      Perlin2Data* p2 = (Perlin2Data*)n.data.custom_data;
-     p2->frequency = 1.0f / (float)scale;
+     p2->frequency = frequency;
      p2->gain = gain;
      p2->lacunarity = lacunarity;
      p2->interpolation = interp;

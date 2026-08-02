@@ -92,13 +92,13 @@ static inline float perlin_compute_2d_internal(const PerlinData* p, float x, flo
 }
 
 // Hàm Factory tạo Perlin trả về Struct Noise phẳng cho hệ thống lớn dùng
-static inline Noise noises_perlin_create(int32_t scale, int32_t octaves, float lacunarity, float gain, InterpolationType interp) {
+static inline Noise noises_perlin_create(int32_t seed, float frquency, int32_t octaves, float lacunarity, float gain, InterpolationType interp) {
     Noise n;
     n.type = NOISE_TYPEDEF_PERLIN;
     n.node_ref = NULL;
     
     PerlinData* p = (PerlinData*)n.data.custom_data;
-    p->frequency = 1.0F / (float)scale; // Chuyển đổi từ scale sang frequency hệt bên Java
+    p->frequency = frequency; // Chuyển đổi từ scale sang frequency hệt bên Java
     p->octaves = octaves;
     p->lacunarity = lacunarity;
     p->gain = gain;

@@ -154,14 +154,14 @@ static inline float valCoord2D(int32_t seed, int32_t x, int32_t y)
     return n * n * n * 60493 / 2.14748365E9F;
 }
 
-static inline float sin(float rad) {
+static inline float usin(float rad) {
     int32_t index = (int32_t)(rad * (SIN_COUNT / PI2)); 
     return SIN[index & SIN_MASK];
 }
 
-static inline float cos(float rad) 
+static inline float uscos(float rad) 
 {
-    return sin(rad + 1.5708f);
+    return usin(rad + 1.5708f);
 }
 
 static inline float coord2D(int32_t seed, int32_t x, int32_t y)
@@ -184,6 +184,11 @@ static inline Vec2f coord2D_24(int32_t seed, int32_t x, int32_t y)
     int32_t selector24 = (int32_t)((hash & 0x3FFFFF) * 1.3333334F) & 0x1F;
     return GRAD_2D_24[selector24];
 
+}
+
+static inline int32_t round(float f) 
+{
+    return (f >= 0.0F) ? ((int32_t) (f + 0.5F)) : ((int32_t) (f - 0.5F));
 }
 
 __attribute__((visibility("default"))) void bind_native_noise_constants(float* java_cell_2d, float* java_grad_2d, float* java_grad_2d_24);
