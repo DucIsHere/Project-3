@@ -86,12 +86,14 @@ static inline FragAtomic mat3x3x3_get_frag_atomic_vec(const Mat3x3x3* m, const u
      return ato;
 }
 
-static inline void mat3x3x3_set_atomic_avx8(Mat3x3x3* m, const FragAtomic* batch) {
+static inline void mat3x3x3_set_atomic_avx8(Mat3x3x3* m, const FragAtomic* batch) 
+{
     ALIGN32 float res[8];
     _mm256_store_ps(res, batch->vec);
 
     // Scatter kết quả đã tính bằng AVX2 về lại từng ô nguyên tử 3D
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) 
+    {
         m->data[batch->indices[i]] = res[i];
     }
 }
@@ -103,7 +105,8 @@ static inline void mat3x3x3_set_atomic_avx8(Mat3x3x3* m, const FragAtomic* batch
 
 typedef void (*Atomic_AVX8_Callback)(FragAtomic* batch, void* user_data);
 
-static inline void mat3x3x3_process_all_atomic_avx2(Mat3x3x3* m, Atomic_AVX8_Callback callback, void* user_data, uint32_t* out_mask) {
+static inline void mat3x3x3_process_all_atomic_avx2(Mat3x3x3* m, Atomic_AVX8_Callback callback, void* user_data, uint32_t* out_mask) 
+{
     uint32_t total_mask = 0;
 
     // Lưới 27 ô -> Chia làm 3 đợt AVX2 (8 + 8 + 8) và 1 đợt lẻ (3 ô)
@@ -111,7 +114,8 @@ static inline void mat3x3x3_process_all_atomic_avx2(Mat3x3x3* m, Atomic_AVX8_Cal
     
     // Đợt 1: 8 ô đầu tiên (0..7)
     uint8_t batch1_coords[8][3];
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) 
+    {
         batch1_coords[i][0] = i % 3;
         batch1_coords[i][1] = (i / 3) % 3;
         batch1_coords[i][2] = i / 9;
@@ -124,7 +128,8 @@ static inline void mat3x3x3_process_all_atomic_avx2(Mat3x3x3* m, Atomic_AVX8_Cal
 
     // Đợt 2: 8 ô tiếp theo (8..15)
     uint8_t batch2_coords[8][3];
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) 
+    {
         int idx = i + 8;
         batch2_coords[i][0] = idx % 3;
         batch2_coords[i][1] = (idx / 3) % 3;
@@ -138,7 +143,9 @@ static inline void mat3x3x3_process_all_atomic_avx2(Mat3x3x3* m, Atomic_AVX8_Cal
 
     // Đợt 3: 8 ô tiếp theo (16..23)
     uint8_t batch3_coords[8][3];
-    for (int i = 0; i < 8; i++) {
+
+    for (int i = 0; i < 8; i++) 
+    {
         int idx = i + 16;
         batch3_coords[i][0] = idx % 3;
         batch3_coords[i][1] = (idx / 3) % 3;
