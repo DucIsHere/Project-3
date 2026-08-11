@@ -27,8 +27,8 @@ static inline Noise create_alpha(Noise* a, Noise* i)
      n.type = NOISE_TYPEDEF_ALPHA;
      n.node_ref = NULL;
 
-     float min = noise_get_min_value(input);
-     float max = noise_get_max_value(inpur);
+     float min = noise_get_min_value(i);
+     float max = noise_get_max_value(i);
 
      AlphaData* ad = (AlphaData*)n.data.custom_data;
      ad->alpha = a;

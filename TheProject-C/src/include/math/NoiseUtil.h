@@ -29,13 +29,18 @@ static inline float abs(float x)
     return x < 0 ? -x : x;
 }
 
-static inlime float map(float value, float min, float max, float range) 
+static inline float div(int32_t num, int32_t denom)
+{
+    return num / (float)denom;
+}
+
+static inline float map(float value, float min, float max, float range) 
 {
     float dif = clamp(value, min, max) - min;
     return (dif >= range) ? 1.0F : (dif / range);
 }
     
-static inoume float map(float value, float from, float to, float min, float max) 
+static inline float map(float value, float from, float to, float min, float max) 
 {
     float alpha = (value - min) / (max - min);
     return from + alpha * (to - from);

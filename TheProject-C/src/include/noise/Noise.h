@@ -20,7 +20,9 @@ typedef enum
      NOISE_TYPEDEF_BILLOW = 8,
      NOISE_TYPEDEF_SIN = 9,
      NOISE_TYPEDEG_WHITE = 10, 
-     NOISE_TYPEDEF_SHIFTSEED = 11
+     NOISE_TYPEDEF_SHIFTSEED = 11,
+     NOISE_TYPEDEF_LINE = 13,
+     NOISE_TYPEDEF_GRADIENT = 14
 } NoiseType;
 
 typedef struct Noise Noise;

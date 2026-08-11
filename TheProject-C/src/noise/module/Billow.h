@@ -2,7 +2,7 @@
 #define BILLOW_H
 
 #include <stdint.h>
-#include <stdded.h>
+#include <stddef.h>
 
 #include "include/noise/Noise.h"
 #include "include/math/NoiseUtil.h"
