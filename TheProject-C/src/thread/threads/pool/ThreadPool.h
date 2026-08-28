@@ -200,9 +200,7 @@ void pool_bind_thread_affinity(size_t thread_id);
 void pool_submit(Thrd* pool, void(*func)(void*), void* args, _Atomic(size_t)* counter);
 void pool_wait(_Atomic(size_t)* counter);
 
-
-
-TaskHandle* pool_create_task_ex(Thrd* pool, TaskFunc func, void* arg, TaskPriority prio, CoreType target);
+[[nodicard]] TaskHandle* pool_create_task_ex(Thrd* pool, TaskFunc func, void* arg, TaskPriority prio, CoreType target);
 void pool_add_dependency(TaskHandle* parent, TaskHandle* dependent);
 void pool_submit_task(TaskHandle* task, _Atomic(size_t)* counter, _Atomic(size_t)* future_out);
 
