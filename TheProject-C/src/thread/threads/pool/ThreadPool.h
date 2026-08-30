@@ -3,7 +3,6 @@
 #define CACHE_LINE 64
 
 #include <stddef.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <threads.h>
 #include <stdatomic.h>
