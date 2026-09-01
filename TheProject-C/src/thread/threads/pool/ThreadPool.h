@@ -2,6 +2,12 @@
 #define THREAD_POOL
 #define CACHE_LINE 64
 
+#if defined(__GNUC__) || defined(__clang__)
+#define PCCORE_INLINE inline __attribute__((always_inline))
+#else
+#define PCCORE_INLINE inline
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include <threads.h>
@@ -88,15 +94,16 @@ typedef struct DependencyNode
 
 typedef void* (*TaskFunc)(TaskHandle* self, void* arg);
 
-struct TaskHandle
+struct alignas(CACHE_LINE) TaskHandle
 {
      TaskFunc func;
      void* arg;
+
      _Atomic(size_t)* counter;
      _Atomic(void*)* feature_result;
 
-     _Atomic(int32_t) dependency_count;
-     _Atomic(DependencyNode*) dependents_head;
+     alignas(CACHE_LINE) _Atomic(int32_t) dependency_count;
+     alignas(CACHE_LINE) _Atomic(DependencyNode*) dependents_head;
      _Atomic(TaskState) state;
 
      TaskHandle* parent;
@@ -119,6 +126,15 @@ typedef struct
      _Atomic size_t squence;
      TaskHandle* task;
 } QueueCell;
+
+typedef struct alignas(CACHE_LINE)
+{
+     void* java_in_buffer;
+     void* java_out_buffer;
+     void* pcore_aligned_ptr;
+     size_t data_size;
+     uint32_t flags;
+} FFIBridgeContext;
 
 typedef struct alignas(CACHE_LINE)
 {
@@ -206,6 +222,13 @@ void pool_submit_task(TaskHandle* task, _Atomic(size_t)* counter, _Atomic(size_t
 void pool_wait_active(Thrd* pool, _Atomic(size_t)* counter);
 
 void pool_fork_active(TaskHandle* parent_task, TaskFunc sub_func, void** arg_array, size_t subtask_count);
+
+void pool_pcore_dag_excute_direct(TaskHandle* root_task, _Atomic(size_t)* counter);
+
+[[nodiscard]] FFIBridgeContext* ffi_create_context(void* java_in, void* java_out, size_t size);
+void ffi_bridge_free_context(FFIBridgeContext* ctx);
+
+void pool_submit_ffi_dag_pipeline(Thrd* pool, FFIBridgeContext* ffi_ctx, TaskFunc pcore_compute_func, _Atomic(size_t)* counter);
 
 void pool_pde_parallel(Thrd* pool, size_t total_element, ParallelFunc func, void* user_data);
 void pool_pde_barrier(ParallelRange* range);

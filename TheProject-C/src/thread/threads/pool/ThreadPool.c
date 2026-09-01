@@ -1,5 +1,6 @@
 #include "thread/threads/pool/ThreadPool.h"
 
+#incluce <immintrin.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -113,7 +114,7 @@ static inline void arena_free_task(TaskHandle* task)
 
 static inline bool queue_push(Thrd* pool, TaskPriority prio, CoreType core_type, TaskHandle* task)
 {
-     MPMCQueue* q = (core_type = CORE_TYPE_PCORE) ? &pool->p_queues[prio] : &pool->e_queues[prio];
+     MPMCQueue* q = (core_type == CORE_TYPE_PCORE) ? &pool->p_queues[prio] : &pool->e_queues[prio];
      QueueCell* cell;
      size_t pos = atomic_load_explicit(&q->tail, memory_order_relaxed);
 
@@ -177,28 +178,35 @@ static inline TaskHandle* queue_pop(Thrd* pool, TaskPriority prio, CoreType core
 // =============================================================================
 static inline void execute_task_handle(TaskHandle* task) 
 {
-     atomic_store_explicit(&task->state, TASK_STATE_EXECUTING, memory_order_release);
+    TaskHandle* current = task;
 
-     void* res = nullptr;
-     if (task->func) 
-     {
-         res = task->func(task, task->arg);
-     }
+    while (current != nullptr)
+    {
 
-     if (task->future_result) 
-     {
-         atomic_store_explicit(task->future_result, res, memory_order_release);
-     }
+    atomic_store_explicit(&task->state, TASK_STATE_EXECUTING, memory_order_release);
 
-     if (task->counter) 
-     {
-         atomic_fetch_sub_explicit(task->counter, 1, memory_order_release);
-     }
+    void* res = nullptr;
+    if (task->func) 
+    {
+        res = task->func(task, task->arg);
+    }
+
+    if (task->future_result) 
+    {
+        atomic_store_explicit(task->future_result, res, memory_order_release);
+    }
+
+    if (task->counter) 
+    {
+        atomic_fetch_sub_explicit(task->counter, 1, memory_order_release);
+    }
 
     atomic_store_explicit(&task->state, TASK_STATE_FINISHED, memory_order_release);
 
     // Kích hoạt các Task con phụ thuộc trong DAG (Fan-out)
     DependencyNode* curr = atomic_load_explicit(&task->dependents_head, memory_order_acquire);
+    TaskHandle* immediate_next = nullptr;
+
     while (curr) {
         TaskHandle* dep = curr->task;
         if (atomic_fetch_sub_explicit(&dep->dependency_count, 1, memory_order_acq_rel) == 1) {
@@ -215,6 +223,8 @@ static inline void execute_task_handle(TaskHandle* task)
 
     // Trả lại tài nguyên cho Arena sau khi hoàn tất
     arena_free_task(task);
+    current = immediate_next;
+}
 }
 
 // =============================================================================
@@ -294,8 +304,33 @@ static int worker_thread_entry(void* arg) {
         if (task) {
             execute_task_handle(task);
         } else {
+            if (is_p_core)
+            {
+                uint32_t spin = 0;
+                while (spin < 2500)
+                {
+                    _mm_pause();
+
+                    for (int p = 0; p < TASK_PRIO_COUNT; p++)
+                    {
+                        task = queue_pop(pool, (TaskPriority)p, CORE_TYPE_PCORE);
+                        if (task) break;
+                    }
+
+                    if (task) break;
+                    spin++;
+                }
+
+                if (task)
+                {
+                    execute_task_handle(task);
+                    continue;
+                }
+            }
+
             mtx_lock(&pool->wake_lock);
-            cnd_wait(&pool->wake_signals, &pool->wake_lock);
+            cnd_wait(&pool->wake_signals);
+            cnd_wait(&pool->wake_lock);
             mtx_unlock(&pool->wake_lock);
         }
     }
@@ -504,4 +539,34 @@ void pool_pde_barrier(ParallelRange* range) {
             sched_yield();
         }
     }
+}
+
+FFIBridgeContext* ffi_bridge_create_context(void* java_in, void* java_out, size_t size)
+{
+    FFIBridgeContext* ctx = (FFIBridgeContext*)malloc(sizeof(FFIBridgeContext));
+    ctx->java_in_buffer = java_in;
+    ctx->java_out_buffer = java_out;
+    ctx->data_size = size;
+
+    uintptr_t raw_ptr = (uintptr_t)java_in;
+    uintptr_t aligned_ptr = (raw_ptr + 63) & ~63;
+
+    ctx->pcore_aligned_ptr = (void*)aligned_ptr;
+    ctx->flags = 0;
+
+    return ctx;
+}
+
+void ffi_bridge_free_context(FFIBridgeContext* ctx)
+{
+    if (ctx) free(ctx);
+}
+
+void pool_submit_ffi_dag_pipeline(Thrd* pool, FFIBridgeContext* ffi_ctx, TaskHandle pcore_compute_func, _Atomic(size_t)* counter)
+{
+    TaskHandle* prep_task = pool_create_task_ex(pool, nullptr, ffi_ctx, TASK_PRIO_HIGH, CORE_TYPE_ECORE);
+    TaskHandle* comp_task = pool_create_task_ex(pool, pcore_compute_func, ffi_ctx, TASK_PRIO_CRITICAL, CORE_TYPE_PCORE);
+    pool_add_dependency(prep_task, comp_task);
+    pool_submit_task(prep_task, counter, nullptr);
+    pool_submit_task(comp_task, counter, nullptr);
 }
