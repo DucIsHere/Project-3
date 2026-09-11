@@ -22,10 +22,10 @@ constexpr size_t FIX_HALF = 32768;
 
 typedef struct alignas(64) {
     uint16_t sin_quarter[LUT_SIZE + 1];  // Dùng cho Sin, Cos, Tan
-    uint16_t sinpi_quarter[LUT_SIZE + 1];
-    uint16_t tanpi_table[LUT_SIZE + 1];
-    uint16_t atanpi_table[LUT_SIZE + 1];
-    uint16_t asinpi_table[LUT_SIZE + 1];
+    uint16_t sinpi_quarter[129];
+    uint16_t tanpi_table[129];
+    uint16_t atanpi_table[129];
+    uint16_t asinpi_table[L129];
     uint16_t log2_mantissa[LUT_SIZE + 1];// Dùng cho Log2, Log_X(Y)
     uint16_t exp2_fraction[LUT_SIZE + 1];// Dùng cho Exp2, Exp, Pow
     uint16_t sqrt_mantissa[LUT_SIZE + 1];// Dùng cho Sqrt (Căn bậc hai)
@@ -313,4 +313,39 @@ ALWAYS_INLINE int32_t ip_asinpi(int32_t x_q16) {
 ALWAYS_INLINE int32_t ip_acospi(int32_t x_q16) {
     // acospi(x) = 0.5 - asinpi(x)
     return (FIX_ONE >> 1) - ip_asinpi(x_q16);
+}
+
+// Trả về góc dạng Q16.16 trong dải [-1.0, 1.0] (tương ứng [-180 đến +180 độ])
+ALWAYS_INLINE int32_t ip_atan2pi(int32_t y_q16, int32_t x_q16) {
+    if (x_q16 == 0) {
+        if (y_q16 > 0) return  (FIX_ONE >> 1);  // +0.5 pi (90 độ)
+        if (y_q16 < 0) return -(FIX_ONE >> 1);  // -0.5 pi (-90 độ)
+        return 0;                               // (0, 0)
+    }
+
+    int32_t abs_x = (x_q16 < 0) ? -x_q16 : x_q16;
+    int32_t abs_y = (y_q16 < 0) ? -y_q16 : y_q16;
+    int32_t half_pi = FIX_ONE >> 1;
+
+    // Tối ưu hóa: Phân chia theo biên độ |y| và |x| để tránh tràn số
+    if (abs_y <= abs_x) {
+        // Dải góc từ -45 đến +45 độ và 135 đến 225 độ
+        int32_t ratio = ip_div_fast(y_q16, x_q16);
+        int32_t atan_val = ip_atanpi(ratio);
+        
+        if (x_q16 < 0) {
+            return (y_q16 >= 0) ? (atan_val + FIX_ONE) : (atan_val - FIX_ONE);
+        }
+        return atan_val;
+    } else {
+        // Dải góc từ 45 đến 135 độ và -135 đến -45 độ
+        int32_t ratio = ip_div_fast(x_q16, y_q16);
+        int32_t atan_val = ip_atanpi(ratio);
+        
+        if (y_q16 >= 0) {
+            return half_pi - atan_val;
+        } else {
+            return -half_pi - atan_val;
+        }
+    }
 }
