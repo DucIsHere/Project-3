@@ -95,3 +95,9 @@ ALWAYS_INLINE int32_t de_tanpi(int32_t x_q16) {
     // Nhân pi: pi * sec^2(pi * x)
     return (int32_t)(((int64_t)sec_sq * FIX_PI) >> FIX_SHIFT);
 }
+
+ALWAYS_INLINE int32_t de_sinh(int32_t x) {
+    if (x == 0) return 0;
+
+    int32_t abs_x = (abs_x < 0) ? -abs_x : abs_x;
+}
