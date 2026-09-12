@@ -9,7 +9,6 @@
 #define SIN_BITS 12
 #define SIN_MASK 4095
 #define SIN_COUNT 4096
-
 #define CUBIC_2D_BOUNDING 0.44444447f
 #define PI2 6.2831855f
 
