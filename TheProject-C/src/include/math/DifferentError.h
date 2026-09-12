@@ -100,4 +100,12 @@ ALWAYS_INLINE int32_t de_sinh(int32_t x) {
     if (x == 0) return 0;
 
     int32_t abs_x = (abs_x < 0) ? -abs_x : abs_x;
+
+    int32_t exp_pos = ip_exp2(abs_x);
+
+    int32_t exp_neg = ip_div_fast(FIX_ONE, exp_pos);
+
+    int32_t res = (exp_pos - exp_neg) >> 1;
+
+    return (x_q16 < 0) ? -res : res;
 }
